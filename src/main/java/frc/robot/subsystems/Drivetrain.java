@@ -12,6 +12,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -20,12 +21,13 @@ public class Drivetrain extends SubsystemBase {
   private static final int mDeviceID[] = {1,2,3,4,5,6,7,8};//even motors(ID) are turn
   private static final int tDeviceID[] = {21,23,24,22};//encoder device ids
   private static final double tOffset[] = {90.97, 175.61,308.057,301.03};//turn motor offsets
+  private static final int gDeviceID = 11;
   private WPI_TalonSRX t[] = new WPI_TalonSRX[4];//encoders
   private CANSparkMax m[] = new CANSparkMax[8];//motors
   private RelativeEncoder e[] = new RelativeEncoder[4];//drive encoders
   private Pigeon2 gyro;
   public Drivetrain() {
-    gyro = new Pigeon2(11, "rio");
+    gyro = new Pigeon2(gDeviceID, "rio");
     for(int i=0;i<8;i++){
       m[i] = new CANSparkMax(mDeviceID[i], MotorType.kBrushless);
       m[i].restoreFactoryDefaults();
@@ -50,11 +52,16 @@ public class Drivetrain extends SubsystemBase {
   }
   public void resetDEncoders(){for(int i=0;i<4;i++){e[i].setPosition(0);}}
   public double getTEncoderPostion(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)]))%360;}
-  public double getTEncoderPostionGyro(int tEncNum){return ((((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)]))+(gyro.getYaw()))%360;}
+  public double getTEncoderPostionGyro(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)])+(gyro.getYaw()))%360;}
   public double getDEncoderPosition(int dEncNum){return e[dEncNum].getPosition();}
   public void setSpeed(double speed, int motor){m[motor].set(speed);}
+  public void gyroPutPitch(){SmartDashboard.putNumber("Pitch", gyro.getPitch());}
+  public void gyroPutRoll(){SmartDashboard.putNumber("Roll", gyro.getRoll());}
+  public void gyroPutYaw(){SmartDashboard.putNumber("Yaw", gyro.getYaw());}
+  public double gyroGetPitch(){return gyro.getPitch();}
+  public double gyroGetRoll(){return gyro.getRoll();}
   public double gyroGetYaw(){return gyro.getYaw();}
-  public void gyroSetYaw(){gyro.setYaw(0);}
+  public void gyroSetYaw(double angle){gyro.setYaw(angle);}
   public void stopMotors(){
     for(int i=0;i<8;i++){
       m[i].setOpenLoopRampRate(Constants.fremp);
