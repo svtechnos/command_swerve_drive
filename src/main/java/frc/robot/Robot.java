@@ -68,6 +68,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
   @Override
   public void teleopInit() {
+    drivetrain.gyroSetYaw();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -76,13 +77,13 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
   }
-
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     double jX;
     double jY;
     double dPower;
+    double cAngle;
     double dAngle;
     double tAngle;
     double dir;
@@ -92,8 +93,10 @@ public class Robot extends TimedRobot {
     tAngle=cTpResult[0];
     dPower=cTpResult[1];
     for(int i=1;i<8;i+=2){
-      //if(Math.abs(joystick.getZ())>Constants.rT){if(i==1){tAngle=315;}if(i==3){tAngle=45;}if(i==5){tAngle=315;}if(i==7){tAngle=45;}}
-      double[] deltaM = drivetrain.deltaMod(tAngle, drivetrain.getTEncoderPostion((i-1)/2));
+      cAngle=drivetrain.getTEncoderPostionGyro((i-1)/2);
+      if(joystick.getZ()<-(Constants.rT)){cAngle=drivetrain.getTEncoderPostion((i-1)/2);dPower = (0.6*(Math.abs(joystick.getZ())-Constants.rT));if(i==1){tAngle=315;}if(i==3){tAngle=45;}if(i==5){tAngle=135;}if(i==7){tAngle=225;}}
+      else if(joystick.getZ()>Constants.rT){cAngle=drivetrain.getTEncoderPostion((i-1)/2);dPower = (0.6*(Math.abs(joystick.getZ())-Constants.rT));if(i==1){tAngle=135;}if(i==3){tAngle=225;}if(i==5){tAngle=315;}if(i==7){tAngle=45;}}
+      double[] deltaM = drivetrain.deltaMod(tAngle, cAngle);
       dAngle=deltaM[0];
       dir=deltaM[1];
       if(dPower<Constants.dPowerMin){dAngle = 0;dPower = 0;}      

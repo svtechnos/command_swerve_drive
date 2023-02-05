@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -22,7 +23,9 @@ public class Drivetrain extends SubsystemBase {
   private WPI_TalonSRX t[] = new WPI_TalonSRX[4];//encoders
   private CANSparkMax m[] = new CANSparkMax[8];//motors
   private RelativeEncoder e[] = new RelativeEncoder[4];//drive encoders
+  private Pigeon2 gyro;
   public Drivetrain() {
+    gyro = new Pigeon2(11, "rio");
     for(int i=0;i<8;i++){
       m[i] = new CANSparkMax(mDeviceID[i], MotorType.kBrushless);
       m[i].restoreFactoryDefaults();
@@ -47,8 +50,11 @@ public class Drivetrain extends SubsystemBase {
   }
   public void resetDEncoders(){for(int i=0;i<4;i++){e[i].setPosition(0);}}
   public double getTEncoderPostion(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)]))%360;}
+  public double getTEncoderPostionGyro(int tEncNum){return ((((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)]))+(gyro.getYaw()))%360;}
   public double getDEncoderPosition(int dEncNum){return e[dEncNum].getPosition();}
   public void setSpeed(double speed, int motor){m[motor].set(speed);}
+  public double gyroGetYaw(){return gyro.getYaw();}
+  public void gyroSetYaw(){gyro.setYaw(0);}
   public void stopMotors(){
     for(int i=0;i<8;i++){
       m[i].setOpenLoopRampRate(Constants.fremp);
