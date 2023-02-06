@@ -10,18 +10,17 @@ import frc.robot.subsystems.Drivetrain;
 
 public class DirectionDrive extends CommandBase {
   Drivetrain drivetrain;
-  double angle;
+  double tAngle;
   double speed;
   double distance;
   double tPower;
-  boolean c = false;
   double cAngle;
   double dAngle;
   double dir;
   /** Creates a new DirectionDrive. */
-  public DirectionDrive(Drivetrain drivetrain, double angle, double speed, double distance){
+  public DirectionDrive(Drivetrain drivetrain, double tAngle, double speed, double distance){
     this.drivetrain = drivetrain;
-    this.angle=angle;
+    this.tAngle=tAngle;
     this.speed=speed;
     this.distance=distance;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -35,23 +34,23 @@ public class DirectionDrive extends CommandBase {
   public void execute(){
     for(int i=1;i<8;i+=2){
       cAngle=drivetrain.getTEncoderPostion((i-1)/2);
-      if(angle-cAngle>90){angle=Math.abs(angle-180);speed*=-1;}
-      double[] deltaM = drivetrain.deltaMod(angle, cAngle);
+      System.out.println("DriveEncoder 0: "+drivetrain.getDEncoderPosition(0));
+      double[] deltaM = drivetrain.deltaMod(tAngle, cAngle);
       dAngle=deltaM[0];
       dir=deltaM[1];
-      tPower=Constants.tF*dAngle/180;
-      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);drivetrain.setSpeed(tPower, i);}
-      if(Math.abs(dAngle)>Constants.turnInProgress){c= false;continue;}
-      if(drivetrain.getDEncoderPosition(i-1)<distance){drivetrain.setSpeed(Constants.dF*speed*dir, i-1); c=false;}
-      else{c=true;}
+      double tPower=Constants.tF*dAngle/180;
+      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
+      drivetrain.setSpeed(tPower, i);
+      if(Math.abs(dAngle)<Constants.turnInProgress){drivetrain.setSpeed(Constants.dF*speed*dir, i-1);}
+      else{drivetrain.setSpeed(0, i-1);}
     }
   }
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {drivetrain.stopMotors();drivetrain.resetDEncoders();}
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return c;
+    return drivetrain.getDEncoderPosition(0)>distance;
   }
 }

@@ -36,7 +36,8 @@ public class Drivetrain extends SubsystemBase {
       t[i/2]=new WPI_TalonSRX(tDeviceID[i/2]);
       t[i/2].configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
       m[i].setOpenLoopRampRate(Constants.dremp);
-      e[i/2] = m[i].getEncoder();}
+      e[i/2] = m[i].getEncoder();
+      e[i/2].setPositionConversionFactor(1/24.367);}
       else{m[i].setOpenLoopRampRate(Constants.tremp);}
     }
   }
@@ -50,7 +51,12 @@ public class Drivetrain extends SubsystemBase {
     //System.out.println("c: "+c+" t: "+t+" d: "+d+" dir: "+dir);
     return new double[] {-d, dir};
   }
-  public void resetDEncoders(){for(int i=0;i<4;i++){e[i].setPosition(0);}}
+  public void resetDEncoders(){
+    e[0].setPosition(0);
+    e[1].setPosition(0);
+    e[2].setPosition(0);
+    e[3].setPosition(0);
+  }
   public double getTEncoderPostion(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)]))%360;}
   public double getTEncoderPostionGyro(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)])+(gyro.getYaw()))%360;}
   public double getDEncoderPosition(int dEncNum){return e[dEncNum].getPosition();}

@@ -12,21 +12,27 @@ import frc.robot.subsystems.Drivetrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
+ * each mode, as described in th
+ * e TimedRobot documentation. If you change the name of this class or
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private final Joystick joystick = new Joystick(0);
-  private final Drivetrain drivetrain = new Drivetrain();
+  //private final Drivetrain drivetrain = new Drivetrain();
+  private RobotContainer m_robotContainer;
+  Drivetrain drivetrain;
+  //private RobotContainer m_robotContainer;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   @Override
   public void robotInit() {
-    new RobotContainer();
+    m_robotContainer=new RobotContainer();
+    this.drivetrain = m_robotContainer.drivetrain;
+    drivetrain.resetDEncoders();
   }
 
   /**
@@ -58,12 +64,11 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-  //  m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-  //  if (m_autonomousCommand != null) {
-  //    m_autonomousCommand.schedule();
-  //  }
+    drivetrain.resetDEncoders();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    if (m_autonomousCommand != null) {
+      m_autonomousCommand.schedule();
+      }
   }
 
   /** This function is called periodically during autonomous. */
@@ -91,17 +96,20 @@ public class Robot extends TimedRobot {
     double cAngle;
     double tAngle;
     double dir;
+    double fdF;
     jX = joystick.getX();
     jY = joystick.getY()*-1;
+    fdF = (joystick.getTrigger())?Constants.dF*2:Constants.dF;
     double[] cTpResult = drivetrain.cTp(jX, jY);
     tAngle=cTpResult[0];
     dPower=cTpResult[1];
     for(int i=1;i<8;i+=2){
       cAngle=drivetrain.getTEncoderPostionGyro((i-1)/2);
-      if(joystick.getZ()<-(Constants.rT)){cAngle=drivetrain.getTEncoderPostion((i-1)/2);dPower = (0.6*(Math.abs(joystick.getZ())-Constants.rT));
-        if(i==1){tAngle=315;}if(i==3){tAngle=45;}if(i==5){tAngle=135;}if(i==7){tAngle=225;}}
-      else if(joystick.getZ()>Constants.rT){cAngle=drivetrain.getTEncoderPostion((i-1)/2);dPower = (0.6*(Math.abs(joystick.getZ())-Constants.rT));
-        if(i==1){tAngle=135;}if(i==3){tAngle=225;}if(i==5){tAngle=315;}if(i==7){tAngle=45;}}
+      if(joystick.getRawButton(2)){
+        if(jX<0){cAngle=drivetrain.getTEncoderPostion((i-1)/2);dPower = (Constants.twF*(Math.abs(jX)));
+          if(i==1){tAngle=315;}if(i==3){tAngle=45;}if(i==5){tAngle=135;}if(i==7){tAngle=225;}}
+        else if(jX>0){cAngle=drivetrain.getTEncoderPostion((i-1)/2);dPower = (Constants.twF*(Math.abs(jX)));
+          if(i==1){tAngle=135;}if(i==3){tAngle=225;}if(i==5){tAngle=315;}if(i==7){tAngle=45;}}}
       double[] deltaM = drivetrain.deltaMod(tAngle, cAngle);
       dAngle=deltaM[0];
       dir=deltaM[1];
@@ -109,7 +117,7 @@ public class Robot extends TimedRobot {
       double tPower=Constants.tF*dAngle/180;
       if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
       drivetrain.setSpeed(tPower, i);
-      if(Math.abs(dAngle)<Constants.turnInProgress){drivetrain.setSpeed(Constants.dF*dPower*dir, i-1);}
+      if(Math.abs(dAngle)<Constants.turnInProgress){drivetrain.setSpeed(fdF*dPower*dir, i-1);}
       else{drivetrain.setSpeed(0, i-1);}
     }
   }
