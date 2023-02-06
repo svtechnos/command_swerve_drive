@@ -115,7 +115,7 @@ public class Robot extends TimedRobot {
       dir=deltaM[1];
       if(dPower<Constants.dPowerMin){dAngle = 0;dPower = 0;}      
       double tPower=Constants.tF*dAngle/180;
-      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
+        if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
       drivetrain.setSpeed(tPower, i);
       if(Math.abs(dAngle)<Constants.turnInProgress){drivetrain.setSpeed(fdF*dPower*dir, i-1);}
       else{drivetrain.setSpeed(0, i-1);}

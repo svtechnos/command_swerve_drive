@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import org.ejml.equation.IntegerSequence.For;
+
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Drivetrain;
 
@@ -15,12 +17,8 @@ public class HexMove extends SequentialCommandGroup {
   public HexMove(Drivetrain drivetrain) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+    for(int i=0;i<=300;i+=5){
     addCommands(
-      new DirectionDrive(drivetrain, 0, 0.2, 0.5),
-      new DirectionDrive(drivetrain, 60, 0.2, 0.5),
-      new DirectionDrive(drivetrain, 120, 0.2, 0.5),
-      new DirectionDrive(drivetrain, 180, 0.2, 0.5),
-      new DirectionDrive(drivetrain, 240, 0.2, 0.5),
-      new DirectionDrive(drivetrain, 300, 0.2, 0.5));
-  }
+        new DirectionDrive(drivetrain, i, 0.2, 0.1)
+      ); }}
 }
