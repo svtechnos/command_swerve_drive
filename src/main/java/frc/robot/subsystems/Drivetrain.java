@@ -82,6 +82,35 @@ public class Drivetrain extends SubsystemBase {
     if (degrees < 0) {degrees = 360 + degrees;}
     return new double[] {degrees, magnitude};
   }
+  public void JoystickMove(double jX, double jY, boolean trigger, boolean b2){
+    double fdF;
+    double dPower;
+    double dAngle;
+    double cAngle;
+    double tAngle;
+    double dir;
+    fdF = (trigger)?Constants.dF*2:Constants.dF;
+    double[] cTpResult = cTp(jX, jY);
+    tAngle=cTpResult[0];
+    dPower=cTpResult[1];
+    for(int i=1;i<8;i+=2){
+      cAngle=getTEncoderPostionGyro((i-1)/2);
+      if(b2){
+        if(jX<0){cAngle=getTEncoderPostion((i-1)/2);dPower = (Constants.twF*(Math.abs(jX)));
+          if(i==1){tAngle=315;}if(i==3){tAngle=45;}if(i==5){tAngle=135;}if(i==7){tAngle=225;}}
+        else if(jX>0){cAngle=getTEncoderPostion((i-1)/2);dPower = (Constants.twF*(Math.abs(jX)));
+          if(i==1){tAngle=135;}if(i==3){tAngle=225;}if(i==5){tAngle=315;}if(i==7){tAngle=45;}}}
+      double[] deltaM = deltaMod(tAngle, cAngle);
+      dAngle=deltaM[0];
+      dir=deltaM[1];
+      if(dPower<Constants.dPowerMin){dAngle = 0;dPower = 0;}      
+      double tPower=Constants.tF*dAngle/180;
+      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
+      setSpeed(tPower, i);
+      if(Math.abs(dAngle)<Constants.turnInProgress){setSpeed(fdF*dPower*dir, i-1);}
+      else{setSpeed(0, i-1);}
+    }
+  }
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

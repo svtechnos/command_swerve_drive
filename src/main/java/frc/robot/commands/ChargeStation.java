@@ -29,13 +29,25 @@ public class ChargeStation extends CommandBase {
   public void execute() {
     double p;
     double e;
+    double t;
     e=-(drivetrain.gyroGetPitch())-lPitch;
     if(Math.abs(e)>Constants.ChargeStationConstants.climbDeg){cold=0;}
     p = Constants.ChargeStationConstants.gain*e;
     p=(p>Constants.ChargeStationConstants.clip)?Constants.ChargeStationConstants.clip:((p<-Constants.ChargeStationConstants.clip)?-Constants.ChargeStationConstants.clip:p);
-    for(int i=0;i<8;i+=2){
+    if((drivetrain.getTEncoderPostion(0)<Constants.ChargeStationConstants.angleClip)&&(drivetrain.getTEncoderPostion(1)<Constants.ChargeStationConstants.angleClip)&&(drivetrain.getTEncoderPostion(2)<Constants.ChargeStationConstants.angleClip)&&(drivetrain.getTEncoderPostion(3)<Constants.ChargeStationConstants.angleClip)){
+      for(int i=0;i<8;i+=2){
       if(cold==1){drivetrain.setSpeed(Constants.ChargeStationConstants.start, i);}
       else{drivetrain.setSpeed(p, i);}
+      }
+    }
+    else{
+      for(int i=0;i<8;i+=2){
+        if(drivetrain.getTEncoderPostion((i/2)+1)>Constants.ChargeStationConstants.angleClip){
+          t=Constants.ChargeStationConstants.gain*drivetrain.getTEncoderPostion((i/2)+1);
+          t=(t>Constants.mT)?Constants.mT:((t<-Constants.mT)?-Constants.mT:t);
+          drivetrain.setSpeed(t, i+1);
+        }
+      }
     }
   }
 
