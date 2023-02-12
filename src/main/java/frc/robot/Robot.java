@@ -19,10 +19,14 @@ import frc.robot.subsystems.Drivetrain;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-  private final Joystick joystick = new Joystick(0);
   //private final Drivetrain drivetrain = new Drivetrain();
   private RobotContainer m_robotContainer;
   Drivetrain drivetrain;
+  Joystick joystick;
+  public double jxArray[] = new double[750];
+  public double jyArray[] = new double[750];
+  public int idx = 750;
+  public int idxr = 750;
   //private RobotContainer m_robotContainer;
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -32,6 +36,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer=new RobotContainer();
     this.drivetrain = m_robotContainer.drivetrain;
+    this.joystick = m_robotContainer.joystick;
     drivetrain.resetDEncoders();
   }
 
@@ -99,10 +104,14 @@ public class Robot extends TimedRobot {
     double fdF;
     jX = joystick.getX();
     jY = joystick.getY()*-1;
+    if(idxr<750){jX=jxArray[idxr];jY=jyArray[idxr];idxr++;System.out.println(idxr);}
     fdF = (joystick.getTrigger())?Constants.dF*2:Constants.dF;
     double[] cTpResult = drivetrain.cTp(jX, jY);
     tAngle=cTpResult[0];
     dPower=cTpResult[1];
+    if(joystick.getRawButton(11)){idx=0;}
+    if(joystick.getRawButton(12)){idxr=0;}
+    if(idx<750){jxArray[idx]=jX;jyArray[idx]=jY;idx++;System.out.println(idx);}
     for(int i=1;i<8;i+=2){
       cAngle=drivetrain.getTEncoderPostionGyro((i-1)/2);
       if(joystick.getRawButton(2)){
@@ -115,7 +124,7 @@ public class Robot extends TimedRobot {
       dir=deltaM[1];
       if(dPower<Constants.dPowerMin){dAngle = 0;dPower = 0;}      
       double tPower=Constants.tF*dAngle/180;
-        if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
+      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
       drivetrain.setSpeed(tPower, i);
       if(Math.abs(dAngle)<Constants.turnInProgress){drivetrain.setSpeed(fdF*dPower*dir, i-1);}
       else{drivetrain.setSpeed(0, i-1);}

@@ -37,7 +37,7 @@ public class Drivetrain extends SubsystemBase {
       t[i/2].configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
       m[i].setOpenLoopRampRate(Constants.dremp);
       e[i/2] = m[i].getEncoder();
-      e[i/2].setPositionConversionFactor(1/20.0);}
+      e[i/2].setPositionConversionFactor(1/20);}
       else{m[i].setOpenLoopRampRate(Constants.tremp);}
     }
   }

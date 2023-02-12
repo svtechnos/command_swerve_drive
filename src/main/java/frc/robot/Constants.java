@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.commands.ChargeStation;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -24,6 +26,12 @@ public final class Constants {
   public static final double mT = 0.4;//max turn speed
   public static final double twF = 0.6;//twist factor
   public static final double turnInProgress = 20;
+  public static class ChargeStationConstants {
+    public static final double gain = 0.05;
+    public static final double clip = 0.5;
+    public static final double start = 0.2;
+    public static final double climbDeg = 10;
+  }
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
