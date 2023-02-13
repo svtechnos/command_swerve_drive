@@ -19,16 +19,15 @@ public final class Constants {
   public static final double tF = 0.8;//turn factor
   public static final double dF = 0.5;//drive factor
   public static final double tremp=0.1;//turn ramp
-  public static final double dremp=0.1;//drive ramp
+  public static final double dremp=0.5;//drive ramp
   public static final double fremp=0.2;//falling ramp
   public static final double mT = 0.4;//max turn speed
   public static final double twF = 0.6;//twist factor
   public static final double turnInProgress = 20;
   public static class ChargeStationConstants {
-    public static final double gain = 0.005;
-    public static final double tgain = 0.007;
+    public static final double gain = 0.05;
     public static final double clip = 0.5;
-    public static final double start = 0.2  ;
+    public static final double start = 0.2;
     public static final double climbDeg = 10;
     public static final double angleClip = 5;
   }

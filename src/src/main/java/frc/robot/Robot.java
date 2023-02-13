@@ -73,7 +73,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     drivetrain.resetDEncoders();
-    m_autonomousCommand = null;//m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
       }else{if(flag==1){idxr=0;flag=0;}}
