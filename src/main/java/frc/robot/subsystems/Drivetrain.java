@@ -12,6 +12,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -26,7 +27,9 @@ public class Drivetrain extends SubsystemBase {
   private CANSparkMax m[] = new CANSparkMax[8];//motors
   private RelativeEncoder e[] = new RelativeEncoder[4];//drive encoders
   private Pigeon2 gyro;
-  public Drivetrain() {
+  private Joystick joystick;
+  public Drivetrain(Joystick joystick) {
+    this.joystick = joystick;
     gyro = new Pigeon2(gDeviceID, "rio");
     for(int i=0;i<8;i++){
       m[i] = new CANSparkMax(mDeviceID[i], MotorType.kBrushless);
@@ -82,17 +85,12 @@ public class Drivetrain extends SubsystemBase {
     if (degrees < 0) {degrees = 360 + degrees;}
     return new double[] {degrees, magnitude};
   }
-  public void JoystickMove(double jX, double jY, boolean trigger, boolean b2){
+  public void RobotMove(double tAngle, double dPower, double jX, boolean trigger, boolean b2){
     double fdF;
-    double dPower;
     double dAngle;
     double cAngle;
-    double tAngle;
     double dir;
     fdF = (trigger)?Constants.dF*2:Constants.dF;
-    double[] cTpResult = cTp(jX, jY);
-    tAngle=cTpResult[0];
-    dPower=cTpResult[1];
     for(int i=1;i<8;i+=2){
       cAngle=getTEncoderPostionGyro((i-1)/2);
       if(b2){
@@ -110,6 +108,24 @@ public class Drivetrain extends SubsystemBase {
       if(Math.abs(dAngle)<Constants.turnInProgress){setSpeed(fdF*dPower*dir, i-1);}
       else{setSpeed(0, i-1);}
     }
+  }
+  public void CANtest(){
+    if(joystick.getRawButton(1)){setSpeed(0.1, 0);}
+    else{setSpeed(0.1, 0);}
+    if(joystick.getRawButton(2)){setSpeed(0.1, 1);System.out.println("TurnMotor 1 encoder:"+getTEncoderPostion(0));}
+    else{setSpeed(0.1, 1);}
+    if(joystick.getRawButton(3)){setSpeed(0.1, 2);}
+    else{setSpeed(0.1, 2);}
+    if(joystick.getRawButton(4)){setSpeed(0.1, 3);System.out.println("TurnMotor 2 encoder:"+getTEncoderPostion(1));}
+    else{setSpeed(0.1, 3);}
+    if(joystick.getRawButton(5)){setSpeed(0.1, 4);}
+    else{setSpeed(0.1, 4);}
+    if(joystick.getRawButton(6)){setSpeed(0.1, 5);System.out.println("TurnMotor 3 encoder:"+getTEncoderPostion(2));}
+    else{setSpeed(0.1, 5);}
+    if(joystick.getRawButton(7)){setSpeed(0.1, 6);}
+    else{setSpeed(0.1, 6);}
+    if(joystick.getRawButton(7)){setSpeed(0.1, 7);System.out.println("TurnMotor 4 encoder:"+getTEncoderPostion(3));}
+    else{setSpeed(0.1, 7);}
   }
   @Override
   public void periodic() {

@@ -24,7 +24,8 @@ public class Robot extends TimedRobot {
   Drivetrain drivetrain;
   Joystick joystick;
   public double jxArray[] = new double[750];
-  public double jyArray[] = new double[750];
+  public double tAngleArray[] = new double[750];
+  public double dPowerArray[] = new double[750];
   public boolean triggerArray[] = new boolean[750];
   public boolean b2Array[] = new boolean[750];
   public int idx = 750;
@@ -73,7 +74,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     drivetrain.resetDEncoders();
-    m_autonomousCommand = null;//m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
       }else{if(flag==1){idxr=0;flag=0;}}
@@ -83,11 +84,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     double jX=0;
-    double jY=0;
+    double tAngle=0;
+    double dPower=0;
     boolean b2=false;
     boolean trigger=false;
-    if(idxr<750){jX=jxArray[idxr];jY=jyArray[idxr];trigger=triggerArray[idxr];b2=b2Array[idxr];idxr++;System.out.println(idxr);}
-    drivetrain.JoystickMove(jX, jY, trigger, b2);
+    if(idxr<750){jX=jxArray[idxr];tAngle=tAngleArray[idxr];dPower=dPowerArray[idxr];trigger=triggerArray[idxr];b2=b2Array[idxr];idxr++;System.out.println(idxr);}
+    drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
   }
   @Override
   public void teleopInit() {
@@ -106,16 +108,24 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double jX;
     double jY;
+    double tAngle;
+    double dPower;
     boolean b2;
     boolean trigger;
-    jX=joystick.getX();
-    jY=joystick.getY()*-1;
-    b2=joystick.getRawButton(2);
-    trigger=joystick.getTrigger();
-    if(joystick.getRawButton(11)){idx=0;}
-    if(idx==749){flag=1;}
-    if(idx<750){jxArray[idx]=jX;jyArray[idx]=jY;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
-    drivetrain.JoystickMove(jX, jY, trigger, b2);
+    if(joystick.getRawButton(13)){drivetrain.CANtest();}
+    else{
+      jX=joystick.getX();
+      jY=joystick.getY()*-1;
+      b2=joystick.getRawButton(2);
+      trigger=joystick.getTrigger();
+      double[] cTpResult = drivetrain.cTp(jX, jY);
+      tAngle=cTpResult[0];
+      dPower=cTpResult[1];
+      if(joystick.getRawButton(11)){idx=0;}
+      if(idx==749){flag=1;}
+      if(idx<750){jxArray[idx]=jX;tAngleArray[idx]=tAngle;dPowerArray[idx]=dPower;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
+      drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
+    }
   }
   /** This function is called once when the robot is first started up. */
   @Override

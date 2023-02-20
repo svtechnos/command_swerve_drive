@@ -5,7 +5,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.subsystems.Drivetrain;
 
 public class DirectionDrive extends CommandBase {
@@ -32,18 +31,7 @@ public class DirectionDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute(){
-    for(int i=1;i<8;i+=2){
-      cAngle=drivetrain.getTEncoderPostion((i-1)/2);
-      System.out.println("DriveEncoder 0: "+drivetrain.getDEncoderPosition(0));
-      double[] deltaM = drivetrain.deltaMod(tAngle, cAngle);
-      dAngle=deltaM[0];
-      dir=deltaM[1];
-      double tPower=Constants.tF*dAngle/180;
-      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
-      drivetrain.setSpeed(tPower, i);
-      if(Math.abs(dAngle)<Constants.turnInProgress){drivetrain.setSpeed(Constants.dF*speed*dir, i-1);}
-      else{drivetrain.setSpeed(0, i-1);}
-    }
+   drivetrain.RobotMove(tAngle, speed, 0, false, false);
   }
   // Called once the command ends or is interrupted.
   @Override
