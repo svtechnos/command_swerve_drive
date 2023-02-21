@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,7 +34,17 @@ public class Robot extends TimedRobot {
   public int idx = 750;
   public int idxr = 750;
   public int flag;
+  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
+  NetworkTableEntry tx = table.getEntry("tx"); // Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
+  NetworkTableEntry ty = table.getEntry("ty"); // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees
+  NetworkTableEntry ta = table.getEntry("ta"); // Target Area (0% of image to 100% of image)
+  //NetworkTableEntry FTape = table.pipeline(0);
+  //NetworkTableEntry FTagR = table.pipeline(1);
+  //NetworkTableEntry FtagB = table.pipeline(2);
   //private RobotContainer m_robotContainer;
+  
+  
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -74,12 +87,18 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     drivetrain.resetDEncoders();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = null;//m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
       }else{if(flag==1){idxr=0;flag=0;}}
   }
-
+  public double getDistanceFromTopOfPeg() {
+    double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+    double angleToGoalDegrees = Constants.angleLimeDegrees + targetOffsetAngle_Vertical;
+    double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+    double distanceFromLimelightToPegBaseInches = (Constants.heightTopInch - Constants.heightLimeInch)/Math.tan(angleToGoalRadians);
+    return distanceFromLimelightToPegBaseInches;
+  }
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
@@ -112,7 +131,7 @@ public class Robot extends TimedRobot {
     double dPower;
     boolean b2;
     boolean trigger;
-    if(joystick.getRawButton(13)){drivetrain.CANtest();}
+    if(joystick.getRawButton(3)){drivetrain.CANtest();}
     else{
       jX=joystick.getX();
       jY=joystick.getY()*-1;
@@ -134,4 +153,16 @@ public class Robot extends TimedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+  
+  public void setPipeline(Integer pipeline) {
+    if (pipeline < 0) {
+      pipeline = 0;
+      throw new IllegalArgumentException("Pipeline can not be less than zero");
+    } else if (pipeline > 9) {
+      pipeline = 9;
+      throw new IllegalArgumentException("Pipeline can not be greater than nine");
+    }
+    table.getEntry("pipeline").setValue(pipeline);
+  }
+
 }

@@ -20,9 +20,9 @@ import frc.robot.Constants;
 public class Drivetrain extends SubsystemBase {
 
   private static final int mDeviceID[] = {1,2,3,4,5,6,7,8};//even motors(ID) are turn
-  private static final int tDeviceID[] = {21,23,24,22};//encoder device ids
-  private static final double tOffset[] = {90.97, 175.61,308.057,301.03};//turn motor offsets
-  private static final int gDeviceID = 11;
+  private static final int tDeviceID[] = {21,23,24,22};//absolute encoder device ids
+  private static final double tOffset[] = {0.97, 85.61,218.057,211.03};//turn motor offsets
+  private static final int gDeviceID = 11;//gyro device ID
   private WPI_TalonSRX t[] = new WPI_TalonSRX[4];//encoders
   private CANSparkMax m[] = new CANSparkMax[8];//motors
   private RelativeEncoder e[] = new RelativeEncoder[4];//drive encoders
@@ -95,9 +95,9 @@ public class Drivetrain extends SubsystemBase {
       cAngle=getTEncoderPostionGyro((i-1)/2);
       if(b2){
         if(jX<0){cAngle=getTEncoderPostion((i-1)/2);dPower = (Constants.twF*(Math.abs(jX)));
-          if(i==1){tAngle=315;}if(i==3){tAngle=45;}if(i==5){tAngle=135;}if(i==7){tAngle=225;}}
+          if(i==1){tAngle=45;}if(i==3){tAngle=135;}if(i==5){tAngle=225;}if(i==7){tAngle=315;}}
         else if(jX>0){cAngle=getTEncoderPostion((i-1)/2);dPower = (Constants.twF*(Math.abs(jX)));
-          if(i==1){tAngle=135;}if(i==3){tAngle=225;}if(i==5){tAngle=315;}if(i==7){tAngle=45;}}}
+          if(i==1){tAngle=225;}if(i==3){tAngle=315;}if(i==5){tAngle=45;}if(i==7){tAngle=135;}}}
       double[] deltaM = deltaMod(tAngle, cAngle);
       dAngle=deltaM[0];
       dir=deltaM[1];
@@ -109,23 +109,46 @@ public class Drivetrain extends SubsystemBase {
       else{setSpeed(0, i-1);}
     }
   }
+  public void RobotLRMove(double tAngle, double ldPower, double rdPower){
+    double dAngle;
+    double cAngle;
+    double dir;
+    for(int i=1;i<8;i+=2){
+      cAngle=getTEncoderPostion((i-1)/2);
+      double[] deltaM = deltaMod(tAngle, cAngle);
+      dAngle=deltaM[0];
+      dir=deltaM[1];
+      if(rdPower<Constants.dPowerMin){dAngle = 0;rdPower = 0;}
+      if(ldPower<Constants.dPowerMin){dAngle = 0;ldPower = 0;}
+      double tPower=Constants.tF*dAngle/180;
+      if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
+      setSpeed(tPower, i);
+      if((i==3)||(i==1)){
+        if(Math.abs(dAngle)<Constants.turnInProgress){setSpeed(Constants.dF*rdPower*dir, i-1);}
+        else{setSpeed(0, i-1);}
+      }else{
+        if(Math.abs(dAngle)<Constants.turnInProgress){setSpeed(Constants.dF*ldPower*dir, i-1);}
+        else{setSpeed(0, i-1);}
+      }
+    }
+  }
   public void CANtest(){
-    if(joystick.getRawButton(1)){setSpeed(0.1, 0);}
-    else{setSpeed(0.1, 0);}
-    if(joystick.getRawButton(2)){setSpeed(0.1, 1);System.out.println("TurnMotor 1 encoder:"+getTEncoderPostion(0));}
-    else{setSpeed(0.1, 1);}
-    if(joystick.getRawButton(3)){setSpeed(0.1, 2);}
-    else{setSpeed(0.1, 2);}
-    if(joystick.getRawButton(4)){setSpeed(0.1, 3);System.out.println("TurnMotor 2 encoder:"+getTEncoderPostion(1));}
-    else{setSpeed(0.1, 3);}
-    if(joystick.getRawButton(5)){setSpeed(0.1, 4);}
-    else{setSpeed(0.1, 4);}
-    if(joystick.getRawButton(6)){setSpeed(0.1, 5);System.out.println("TurnMotor 3 encoder:"+getTEncoderPostion(2));}
-    else{setSpeed(0.1, 5);}
-    if(joystick.getRawButton(7)){setSpeed(0.1, 6);}
-    else{setSpeed(0.1, 6);}
-    if(joystick.getRawButton(7)){setSpeed(0.1, 7);System.out.println("TurnMotor 4 encoder:"+getTEncoderPostion(3));}
-    else{setSpeed(0.1, 7);}
+    if(joystick.getRawButton(5)){setSpeed(0.1, 0);}
+    else{setSpeed(0, 0);}
+    if(joystick.getRawButton(6)){setSpeed(0.1, 1);System.out.println("TurnMotor 1 encoder:"+getTEncoderPostion(0));}
+    else{setSpeed(0, 1);}
+    if(joystick.getRawButton(7)){setSpeed(0.1, 2);}
+    else{setSpeed(0, 2);}
+    if(joystick.getRawButton(8)){setSpeed(0.1, 3);System.out.println("TurnMotor 2 encoder:"+getTEncoderPostion(1));}
+    else{setSpeed(0, 3);}
+    if(joystick.getRawButton(9)){setSpeed(0.1, 4);}
+    else{setSpeed(0, 4);}
+    if(joystick.getRawButton(10)){setSpeed(0.1, 5);System.out.println("TurnMotor 3 encoder:"+getTEncoderPostion(2));}
+    else{setSpeed(0, 5);}
+    if(joystick.getRawButton(11)){setSpeed(0.1, 6);}
+    else{setSpeed(0, 6);}
+    if(joystick.getRawButton(12)){setSpeed(0.1, 7);System.out.println("TurnMotor 4 encoder:"+getTEncoderPostion(3));}
+    else{setSpeed(0, 7);}
   }
   @Override
   public void periodic() {

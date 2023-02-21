@@ -26,13 +26,20 @@ public final class Constants {
   public static final double turnInProgress = 20;
   public static class ChargeStationConstants {
     //add these to the dashboard
-    public static final double gain = 0.005;
+    public static final double gain = 0.025;
     public static final double tgain = 0.007;
     public static final double clip = 0.5;
-    public static final double start = 0.2  ;
+    public static final double start = 0.23;
     public static final double climbDeg = 10;
     public static final double angleClip = 5;
+    public static final double lrgain = 0.02;
   }
+  public static final double heightTopInch = 75.0; // Height of the retro-reflective tape on the top peg
+  public static final double heightLimeInch = 24.0; // Height of the limelight camera (To be changed later)
+  public static final double angleLimeDegrees = 25.0; // The camera's YAngle (tilted up) (To be changed later)
+  public static final double limelightPlacementOffsetInch = 10.0; // Offset from limelight placement and the front of the robot (To be changed later)
+  public static final double topPegDistanceDeductInch = 45.75; //6in added to account for bumper
+  public static final double bottomPegDistanceDeductInch = 28.75; //6in added to account for bumper
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }

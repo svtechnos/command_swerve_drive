@@ -10,10 +10,9 @@ import frc.robot.subsystems.Drivetrain;
 
 public class ChargeStation extends CommandBase {
   Drivetrain drivetrain;
-  double LPitch;
   double LRoll;
   double cold;
-  double sAngle;
+  double SYaw;
 
   /** Creates a new ChargeStation. */
   public ChargeStation(Drivetrain drivetrain) {
@@ -23,17 +22,29 @@ public class ChargeStation extends CommandBase {
   }
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {LPitch=drivetrain.gyroGetPitch();LRoll=drivetrain.gyroGetRoll();cold=1;sAngle=drivetrain.getTEncoderPostion(0);}
+  public void initialize() {LRoll=drivetrain.gyroGetRoll();cold=1;SYaw=drivetrain.gyroGetYaw();}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double e=-(drivetrain.gyroGetPitch())-LPitch;
+    double e=drivetrain.gyroGetRoll()-LRoll;
     if(Math.abs(e)>Constants.ChargeStationConstants.climbDeg){cold=0;}
     double p = Constants.ChargeStationConstants.gain*e;
     p=(p>Constants.ChargeStationConstants.clip)?Constants.ChargeStationConstants.clip:((p<-Constants.ChargeStationConstants.clip)?-Constants.ChargeStationConstants.clip:p);
-    if(cold==1){drivetrain.RobotMove(0, Constants.ChargeStationConstants.start, 0, false, false);}
-    else{drivetrain.RobotMove(0, p, 0, false, false);}
+    if(cold==1) p=Constants.ChargeStationConstants.start;
+    double lp; 
+    double rp;
+    lp = p+(Constants.ChargeStationConstants.lrgain*(drivetrain.gyroGetYaw()-SYaw));
+    rp = p-(Constants.ChargeStationConstants.lrgain*(drivetrain.gyroGetYaw()-SYaw));
+    if(cold==1){drivetrain.RobotLRMove(90, lp, rp);}
+    else{
+      if(p<0){drivetrain.RobotLRMove(270, -lp, -rp);}
+      else{drivetrain.RobotLRMove(90, lp, rp);}}
+    System.out.println("e: "+e);
+    System.out.println("cold: "+cold);
+    System.out.println("p:"+p);
+    System.out.println("rp:"+rp);
+    System.out.println("lp:"+lp);
   }
   @Override
   public void end(boolean interrupted) {}
