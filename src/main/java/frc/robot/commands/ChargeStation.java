@@ -40,11 +40,6 @@ public class ChargeStation extends CommandBase {
     else{
       if(p<0){drivetrain.RobotLRMove(270, -lp, -rp);}
       else{drivetrain.RobotLRMove(90, lp, rp);}}
-    System.out.println("e: "+e);
-    System.out.println("cold: "+cold);
-    System.out.println("p:"+p);
-    System.out.println("rp:"+rp);
-    System.out.println("lp:"+lp);
   }
   @Override
   public void end(boolean interrupted) {}

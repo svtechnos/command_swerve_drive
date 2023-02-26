@@ -12,7 +12,7 @@ import frc.robot.subsystems.Drivetrain;
 public final class Autos {
   /** Example static factory for an autonomous command. */
   public static CommandBase auto(Drivetrain drivetrain, Joystick joystick) {
-    return Commands.sequence(new HexMove(drivetrain));
+    return Commands.sequence(new SequentialMovement(drivetrain));
   }
 
   private Autos() {

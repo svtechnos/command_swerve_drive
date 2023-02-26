@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -26,25 +27,14 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   Drivetrain drivetrain;
   Joystick joystick;
-  public double jxArray[] = new double[750];
-  public double tAngleArray[] = new double[750];
-  public double dPowerArray[] = new double[750];
-  public boolean triggerArray[] = new boolean[750];
-  public boolean b2Array[] = new boolean[750];
-  public int idx = 750;
-  public int idxr = 750;
-  public int flag;
-  NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-  NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
-  NetworkTableEntry tx = table.getEntry("tx"); // Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
-  NetworkTableEntry ty = table.getEntry("ty"); // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees
-  NetworkTableEntry ta = table.getEntry("ta"); // Target Area (0% of image to 100% of image)
-  //NetworkTableEntry FTape = table.pipeline(0);
-  //NetworkTableEntry FTagR = table.pipeline(1);
-  //NetworkTableEntry FtagB = table.pipeline(2);
-  //private RobotContainer m_robotContainer;
-  
-  
+  public static double jxArray[] = new double[Constants.MacroTime];
+  public static double tAngleArray[] = new double[Constants.MacroTime];
+  public static double dPowerArray[] = new double[Constants.MacroTime];
+  public static boolean triggerArray[] = new boolean[Constants.MacroTime];
+  public static boolean b2Array[] = new boolean[Constants.MacroTime];
+  private int idx = Constants.MacroTime;
+  private double txDouble;
+  private Arm arm;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -54,6 +44,7 @@ public class Robot extends TimedRobot {
     m_robotContainer=new RobotContainer();
     this.drivetrain = m_robotContainer.drivetrain;
     this.joystick = m_robotContainer.joystick;
+    this.arm = m_robotContainer.arm;
     drivetrain.resetDEncoders();
   }
 
@@ -69,6 +60,9 @@ public class Robot extends TimedRobot {
     drivetrain.gyroPutPitch();
     drivetrain.gyroPutRoll();
     drivetrain.gyroPutYaw();
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTableEntry tx = table.getEntry("tx"); // Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
+    txDouble = tx.getDouble(0.0);
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -87,29 +81,21 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     drivetrain.resetDEncoders();
-    m_autonomousCommand = null;//m_robotContainer.getAutonomousCommand();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
-      }else{if(flag==1){idxr=0;flag=0;}}
-  }
+    }
+  }/*
   public double getDistanceFromTopOfPeg() {
     double targetOffsetAngle_Vertical = ty.getDouble(0.0);
     double angleToGoalDegrees = Constants.angleLimeDegrees + targetOffsetAngle_Vertical;
     double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
     double distanceFromLimelightToPegBaseInches = (Constants.heightTopInch - Constants.heightLimeInch)/Math.tan(angleToGoalRadians);
     return distanceFromLimelightToPegBaseInches;
-  }
+  }*/
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-    double jX=0;
-    double tAngle=0;
-    double dPower=0;
-    boolean b2=false;
-    boolean trigger=false;
-    if(idxr<750){jX=jxArray[idxr];tAngle=tAngleArray[idxr];dPower=dPowerArray[idxr];trigger=triggerArray[idxr];b2=b2Array[idxr];idxr++;System.out.println(idxr);}
-    drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
-  }
+  public void autonomousPeriodic() {}
   @Override
   public void teleopInit() {
     drivetrain.gyroSetYaw(0);
@@ -141,8 +127,9 @@ public class Robot extends TimedRobot {
       tAngle=cTpResult[0];
       dPower=cTpResult[1];
       if(joystick.getRawButton(11)){idx=0;}
-      if(idx==749){flag=1;}
-      if(idx<750){jxArray[idx]=jX;tAngleArray[idx]=tAngle;dPowerArray[idx]=dPower;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
+      if(idx<Constants.MacroTime){jxArray[idx]=jX;tAngleArray[idx]=tAngle;dPowerArray[idx]=dPower;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
+      if(joystick.getRawButton(4)){tAngle = (tAngle-(txDouble*Constants.LimeLightAimAssistG))%360;} //limelight aim assist
+      System.out.println(txDouble);
       drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
     }
   }
@@ -154,7 +141,7 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {}
   
-  public void setPipeline(Integer pipeline) {
+  /*public void setPipeline(Integer pipeline) {
     if (pipeline < 0) {
       pipeline = 0;
       throw new IllegalArgumentException("Pipeline can not be less than zero");
@@ -163,6 +150,6 @@ public class Robot extends TimedRobot {
       throw new IllegalArgumentException("Pipeline can not be greater than nine");
     }
     table.getEntry("pipeline").setValue(pipeline);
-  }
+  }*/
 
 }

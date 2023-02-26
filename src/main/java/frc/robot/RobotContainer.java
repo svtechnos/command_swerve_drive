@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.commands.Autos;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +22,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final Joystick joystick = new Joystick(0);
   public final Drivetrain drivetrain = new Drivetrain(joystick);
+  public final Arm arm = new Arm(joystick);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   //private final Joystick m_driverController =

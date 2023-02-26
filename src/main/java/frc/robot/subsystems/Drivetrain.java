@@ -19,10 +19,6 @@ import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
 
-  private static final int mDeviceID[] = {1,2,3,4,5,6,7,8};//even motors(ID) are turn
-  private static final int tDeviceID[] = {21,23,24,22};//absolute encoder device ids
-  private static final double tOffset[] = {0.97, 85.61,218.057,211.03};//turn motor offsets
-  private static final int gDeviceID = 11;//gyro device ID
   private WPI_TalonSRX t[] = new WPI_TalonSRX[4];//encoders
   private CANSparkMax m[] = new CANSparkMax[8];//motors
   private RelativeEncoder e[] = new RelativeEncoder[4];//drive encoders
@@ -30,13 +26,13 @@ public class Drivetrain extends SubsystemBase {
   private Joystick joystick;
   public Drivetrain(Joystick joystick) {
     this.joystick = joystick;
-    gyro = new Pigeon2(gDeviceID, "rio");
+    gyro = new Pigeon2(Constants.gDeviceID, "rio");
     for(int i=0;i<8;i++){
-      m[i] = new CANSparkMax(mDeviceID[i], MotorType.kBrushless);
+      m[i] = new CANSparkMax(Constants.mDeviceID[i], MotorType.kBrushless);
       m[i].restoreFactoryDefaults();
       m[i].setIdleMode(IdleMode.kBrake);
       if(i%2==0){
-      t[i/2]=new WPI_TalonSRX(tDeviceID[i/2]);
+      t[i/2]=new WPI_TalonSRX(Constants.tDeviceID[i/2]);
       t[i/2].configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
       m[i].setOpenLoopRampRate(Constants.dremp);
       e[i/2] = m[i].getEncoder();
@@ -51,7 +47,6 @@ public class Drivetrain extends SubsystemBase {
     if(Math.abs(d)>=90) {d=-(((180*d)/(Math.abs(d)))-d);dir=-1;}
     else{dir= 1;}
     d=(Math.abs(d)<Constants.angleThresh)?0:d;
-    //System.out.println("c: "+c+" t: "+t+" d: "+d+" dir: "+dir);
     return new double[] {-d, dir};
   }
   public void resetDEncoders(){
@@ -60,8 +55,8 @@ public class Drivetrain extends SubsystemBase {
     e[2].setPosition(0);
     e[3].setPosition(0);
   }
-  public double getTEncoderPostion(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)]))%360;}
-  public double getTEncoderPostionGyro(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(tOffset[(tEncNum)])+(gyro.getYaw()))%360;}
+  public double getTEncoderPostion(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(Constants.tOffset[(tEncNum)]))%360;}
+  public double getTEncoderPostionGyro(int tEncNum){return (((t[tEncNum].getSelectedSensorPosition())*360/4096)+(Constants.tOffset[(tEncNum)])+(gyro.getYaw()))%360;}
   public double getDEncoderPosition(int dEncNum){return e[dEncNum].getPosition();}
   public void setSpeed(double speed, int motor){m[motor].set(speed);}
   public void gyroPutPitch(){SmartDashboard.putNumber("Pitch", gyro.getPitch());}
@@ -101,7 +96,7 @@ public class Drivetrain extends SubsystemBase {
       double[] deltaM = deltaMod(tAngle, cAngle);
       dAngle=deltaM[0];
       dir=deltaM[1];
-      if(dPower<Constants.dPowerMin){dAngle = 0;dPower = 0;}      
+      if(dPower<Constants.dPowerMin){dAngle = 0;dPower = 0;}
       double tPower=Constants.tF*dAngle/180;
       if(Math.abs(tPower)>Constants.mT){tPower=Constants.mT*tPower/Math.abs(tPower);}
       setSpeed(tPower, i);
