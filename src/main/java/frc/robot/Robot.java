@@ -34,8 +34,8 @@ public class Robot extends TimedRobot {
   public static boolean triggerArray[] = new boolean[Constants.MacroTime];
   public static boolean b2Array[] = new boolean[Constants.MacroTime];
   private int idx = Constants.MacroTime;
-  private double taDouble;
-  private double tvDouble;
+  //private double taDouble;
+  //private double tvDouble;
   private double txDouble;
   private double tyDouble;
   private Arm arm;
@@ -68,11 +68,11 @@ public class Robot extends TimedRobot {
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTableEntry tx = table.getEntry("tx"); // Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
     NetworkTableEntry ty = table.getEntry("ty"); // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees)
-    NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
-    NetworkTableEntry ta = table.getEntry("ta"); // Target Area (0% of image to 100% of image)
+    //NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
+    //NetworkTableEntry ta = table.getEntry("ta"); // Target Area (0% of image to 100% of image)
     //drivetrain.CANtest();
-    taDouble = ta.getDouble(0.0);
-    tvDouble = tv.getDouble(0.0);
+    //taDouble = ta.getDouble(0.0);
+    //tvDouble = tv.getDouble(0.0);
     txDouble = tx.getDouble(0.0);
     tyDouble = ty.getDouble(0.0);
 

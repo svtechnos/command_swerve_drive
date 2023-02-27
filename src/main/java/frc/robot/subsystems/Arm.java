@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import java.lang.Math;
+import frc.robot.Constants;
 
 
 public class Arm extends SubsystemBase {
@@ -65,6 +66,7 @@ public class Arm extends SubsystemBase {
   private boolean ab6;
   private boolean ab11;
 
+  private int waitcount=0;
   private double claw_a;
   private double claw_b;
   private double[] armlens={0.8,0.66,0.533};
@@ -122,8 +124,8 @@ public class Arm extends SubsystemBase {
     this.arm_joystick = arm_joystick;
   }
 
-  /*  1 for both a and b, 2 for a, 3 for b
-  public int ismoveok(double cura, double curb, double wanta, double wantb){
+  //  1 for both a and b, 2 for a, 3 for b
+  public void ismoveok(double cura, double curb, double wanta, double wantb){
     double delta=Constants.armdelta;
     double deltb=Constants.armdelta;
     if(wanta<cura){delta*=-1;}
@@ -133,13 +135,23 @@ public class Arm extends SubsystemBase {
     else if(wantb==curb){deltb*=0;}
 
     if(getx(cura+delta,curb+deltb)<1.21&&gety(cura+delta,curb+deltb)>0){
-      return 1;
+      servo_W(s3, cura+delta);
+      servo_W(s2, curb+deltb);
+      return;
     }
     if(getx(cura+delta,curb)<1.21&&gety(cura+delta,curb)>0){
-      return 2;
+      servo_W(s3, cura+delta);
+      servo_W(s2, curb);
+      return;
     }
-    return 3;
-  }*/
+    if(getx(cura,deltb+curb)<1.21&&gety(cura, deltb+curb)>0){
+      servo_W(s3, cura);
+      servo_W(s2, curb+deltb);
+      return;
+    }
+    return;
+  }
+
   public boolean isok(double a, double b){
     if(getx(a,b)<1.21&&gety(a,b)>0){
       return true;
@@ -171,7 +183,8 @@ public class Arm extends SubsystemBase {
 
   @Override
   public void periodic() {
-
+    
+    
     // This method will be called once per scheduler run
     // Did we press a new button? set it in the instance state
     // call the setMotor() on all the correspinding motors in a specfic order
@@ -222,7 +235,7 @@ public class Arm extends SubsystemBase {
       claw_a=claw_b-claw_low;
       //claw_current=(ajz)*claw_a+claw_b;
  
-
+    
     if (ab3){
       wrist_current=1476;
       elbow_current=542;
@@ -251,10 +264,15 @@ public class Arm extends SubsystemBase {
       }
     }
     set_servos(claw_current,wrist_current,elbow_current,shoulder_current);
+    
     //System.out.println(" claw="+claw_current+" ajz="+ajz);
-    //System.out.println("apwm: "+shoulder_current+" bpwm: "+ elbow_current);
-    //System.out.println("a: "+conv_a(shoulder_current)+" b: "+ conv_b(elbow_current));
-    //System.out.println("x: "+getx(shoulder_current,elbow_current)+" y: "+gety(shoulder_current,elbow_current));
+    /*if(waitcount==20){
+      ismoveok(shoulder_current, elbow_current, 0,0);
+      waitcount=0;
+    }*/
+    System.out.println("apwm: "+shoulder_current+" bpwm: "+ elbow_current);
+    System.out.println("a: "+conv_a(shoulder_current)+" b: "+ conv_b(elbow_current));
+    System.out.println("x: "+getx(shoulder_current,elbow_current)+" y: "+gety(shoulder_current,elbow_current));
   }
 
   public void neutral() {
@@ -272,7 +290,7 @@ public class Arm extends SubsystemBase {
 
 
   public void set_servos(double claw_set, double wrist_set, double elbow_set, double shoulder_set ) {
-    //System.out.print(claw_set);
+    System.out.print(claw_set);
     servo_W(s0, claw_set); //claw_init
     servo_W(s1, wrist_set); //wrist_init 
     servo_W(s2, elbow_set); //elbow joint 

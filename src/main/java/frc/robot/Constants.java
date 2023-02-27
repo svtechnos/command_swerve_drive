@@ -37,6 +37,7 @@ public final class Constants {
   public static final double topPegDistanceDeductInch = 45.75; //6in added to account for bumper
   public static final double bottomPegDistanceDeductInch = 28.75; //6in added to account for bumper
   public static final double LimeLightAimAssistG = 2;
+  public static final double armdelta = 1;
   public static class ChargeStationConstants {
     //add these to the dashboard
     public static final double gain = 0.025;
