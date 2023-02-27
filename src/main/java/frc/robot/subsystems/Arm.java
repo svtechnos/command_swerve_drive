@@ -252,9 +252,9 @@ public class Arm extends SubsystemBase {
     }
     set_servos(claw_current,wrist_current,elbow_current,shoulder_current);
     //System.out.println(" claw="+claw_current+" ajz="+ajz);
-    System.out.println("apwm: "+shoulder_current+" bpwm: "+ elbow_current);
-    System.out.println("a: "+conv_a(shoulder_current)+" b: "+ conv_b(elbow_current));
-    System.out.println("x: "+getx(shoulder_current,elbow_current)+" y: "+gety(shoulder_current,elbow_current));
+    //System.out.println("apwm: "+shoulder_current+" bpwm: "+ elbow_current);
+    //System.out.println("a: "+conv_a(shoulder_current)+" b: "+ conv_b(elbow_current));
+    //System.out.println("x: "+getx(shoulder_current,elbow_current)+" y: "+gety(shoulder_current,elbow_current));
   }
 
   public void neutral() {
@@ -272,7 +272,7 @@ public class Arm extends SubsystemBase {
 
 
   public void set_servos(double claw_set, double wrist_set, double elbow_set, double shoulder_set ) {
-    System.out.print(claw_set);
+    //System.out.print(claw_set);
     servo_W(s0, claw_set); //claw_init
     servo_W(s1, wrist_set); //wrist_init 
     servo_W(s2, elbow_set); //elbow joint 

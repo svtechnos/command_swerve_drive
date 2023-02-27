@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
     NetworkTableEntry ty = table.getEntry("ty"); // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees)
     NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
     NetworkTableEntry ta = table.getEntry("ta"); // Target Area (0% of image to 100% of image)
-    drivetrain.CANtest();
+    //drivetrain.CANtest();
     taDouble = ta.getDouble(0.0);
     tvDouble = tv.getDouble(0.0);
     txDouble = tx.getDouble(0.0);
@@ -142,7 +142,7 @@ public class Robot extends TimedRobot {
     if(joystick.getRawButton(11)){idx=0;}
     if(idx<Constants.MacroTime){jxArray[idx]=jX;tAngleArray[idx]=tAngle;dPowerArray[idx]=dPower;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
     if(joystick.getRawButton(4)){tAngle = (tAngle-(txDouble*Constants.LimeLightAimAssistG))%360;} //limelight aim assist
-    System.out.println(txDouble);
+    //System.out.println(txDouble);
     drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
   }
   /** This function is called once when the robot is first started up. */
