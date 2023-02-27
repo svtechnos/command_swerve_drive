@@ -160,11 +160,14 @@ public class Arm extends SubsystemBase {
   }
 
   public double conv_a(double a){
-    System.out.println("delta: "+(a-a_zero));
-    return ((a-a_zero)/(a_ninety-a_zero)) *(90);
+    double temp = ((a-a_zero)/(a_ninety-a_zero)) *(90);
+    temp= temp*((2*3.14)/360);
+    return temp;
   }
   public double conv_b(double b){
-    return ((b-b_zero)/(b_ninety-b_zero)) *(90);
+    double temp= ((b-b_zero)/(b_ninety-b_zero)) *(90);
+    temp= temp*((2*3.14)/360);
+    return temp;
   }
 
   public double getx(double a, double b){
