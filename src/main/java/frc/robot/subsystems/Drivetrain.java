@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +23,7 @@ public class Drivetrain extends SubsystemBase {
   private RelativeEncoder e[] = new RelativeEncoder[4];//drive encoders
   private Pigeon2 gyro;
   private Joystick joystick;
+
   public Drivetrain(Joystick joystick) {
     this.joystick = joystick;
     gyro = new Pigeon2(Constants.gDeviceID, "rio");
@@ -128,21 +128,21 @@ public class Drivetrain extends SubsystemBase {
     }
   }
   public void CANtest(){
-    if(joystick.getRawButton(5)){setSpeed(0.1, 0);}
+    if(SmartDashboard.getBoolean("can1", false)){setSpeed(0.1, 0);}
     else{setSpeed(0, 0);}
-    if(joystick.getRawButton(6)){setSpeed(0.1, 1);System.out.println("TurnMotor 1 encoder:"+getTEncoderPostion(0));}
+    if(SmartDashboard.getBoolean("can2", false)){setSpeed(0.1, 1);System.out.println("TurnMotor 1 encoder:"+getTEncoderPostion(0));}
     else{setSpeed(0, 1);}
-    if(joystick.getRawButton(7)){setSpeed(0.1, 2);}
+    if(SmartDashboard.getBoolean("can3", false)){setSpeed(0.1, 2);}
     else{setSpeed(0, 2);}
-    if(joystick.getRawButton(8)){setSpeed(0.1, 3);System.out.println("TurnMotor 2 encoder:"+getTEncoderPostion(1));}
+    if(SmartDashboard.getBoolean("can4", false)){setSpeed(0.1, 3);System.out.println("TurnMotor 2 encoder:"+getTEncoderPostion(1));}
     else{setSpeed(0, 3);}
-    if(joystick.getRawButton(9)){setSpeed(0.1, 4);}
+    if(SmartDashboard.getBoolean("can5", false)){setSpeed(0.1, 4);}
     else{setSpeed(0, 4);}
-    if(joystick.getRawButton(10)){setSpeed(0.1, 5);System.out.println("TurnMotor 3 encoder:"+getTEncoderPostion(2));}
+    if(SmartDashboard.getBoolean("can6", false)){setSpeed(0.1, 5);System.out.println("TurnMotor 3 encoder:"+getTEncoderPostion(2));}
     else{setSpeed(0, 5);}
-    if(joystick.getRawButton(11)){setSpeed(0.1, 6);}
+    if(SmartDashboard.getBoolean("can7", false)){setSpeed(0.1, 6);}
     else{setSpeed(0, 6);}
-    if(joystick.getRawButton(12)){setSpeed(0.1, 7);System.out.println("TurnMotor 4 encoder:"+getTEncoderPostion(3));}
+    if(SmartDashboard.getBoolean("can8", false)){setSpeed(0.1, 7);System.out.println("TurnMotor 4 encoder:"+getTEncoderPostion(3));}
     else{setSpeed(0, 7);}
   }
   @Override

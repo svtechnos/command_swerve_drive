@@ -27,13 +27,17 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   Drivetrain drivetrain;
   Joystick joystick;
+  Joystick arm_joystick;
   public static double jxArray[] = new double[Constants.MacroTime];
   public static double tAngleArray[] = new double[Constants.MacroTime];
   public static double dPowerArray[] = new double[Constants.MacroTime];
   public static boolean triggerArray[] = new boolean[Constants.MacroTime];
   public static boolean b2Array[] = new boolean[Constants.MacroTime];
   private int idx = Constants.MacroTime;
+  private double taDouble;
+  private double tvDouble;
   private double txDouble;
+  private double tyDouble;
   private Arm arm;
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -45,6 +49,7 @@ public class Robot extends TimedRobot {
     this.drivetrain = m_robotContainer.drivetrain;
     this.joystick = m_robotContainer.joystick;
     this.arm = m_robotContainer.arm;
+    this.arm_joystick = m_robotContainer.arm_joystick;
     drivetrain.resetDEncoders();
   }
 
@@ -62,7 +67,15 @@ public class Robot extends TimedRobot {
     drivetrain.gyroPutYaw();
     NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
     NetworkTableEntry tx = table.getEntry("tx"); // Horizontal Offset From Crosshair To Target (-27 degrees to 27 degrees)
+    NetworkTableEntry ty = table.getEntry("ty"); // Vertical Offset From Crosshair To Target (-20.5 degrees to 20.5 degrees)
+    NetworkTableEntry tv = table.getEntry("tv"); // Whether the limelight has any valid targets (0 or 1)
+    NetworkTableEntry ta = table.getEntry("ta"); // Target Area (0% of image to 100% of image)
+    drivetrain.CANtest();
+    taDouble = ta.getDouble(0.0);
+    tvDouble = tv.getDouble(0.0);
     txDouble = tx.getDouble(0.0);
+    tyDouble = ty.getDouble(0.0);
+
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
@@ -72,7 +85,7 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {arm.set_servos(800,300,320,2000);}
 
   @Override
   public void disabledPeriodic() {}
@@ -81,24 +94,26 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     drivetrain.resetDEncoders();
+    arm.set_servos(800,300,320,2000);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-  }/*
+  }
   public double getDistanceFromTopOfPeg() {
-    double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+    double targetOffsetAngle_Vertical = tyDouble;
     double angleToGoalDegrees = Constants.angleLimeDegrees + targetOffsetAngle_Vertical;
     double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
     double distanceFromLimelightToPegBaseInches = (Constants.heightTopInch - Constants.heightLimeInch)/Math.tan(angleToGoalRadians);
     return distanceFromLimelightToPegBaseInches;
-  }*/
+  }
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
   @Override
   public void teleopInit() {
     drivetrain.gyroSetYaw(0);
+    arm.set_servos(800,300,320,2000);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -117,21 +132,18 @@ public class Robot extends TimedRobot {
     double dPower;
     boolean b2;
     boolean trigger;
-    if(joystick.getRawButton(3)){drivetrain.CANtest();}
-    else{
-      jX=joystick.getX();
-      jY=joystick.getY()*-1;
-      b2=joystick.getRawButton(2);
-      trigger=joystick.getTrigger();
-      double[] cTpResult = drivetrain.cTp(jX, jY);
-      tAngle=cTpResult[0];
-      dPower=cTpResult[1];
-      if(joystick.getRawButton(11)){idx=0;}
-      if(idx<Constants.MacroTime){jxArray[idx]=jX;tAngleArray[idx]=tAngle;dPowerArray[idx]=dPower;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
-      if(joystick.getRawButton(4)){tAngle = (tAngle-(txDouble*Constants.LimeLightAimAssistG))%360;} //limelight aim assist
-      System.out.println(txDouble);
-      drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
-    }
+    jX=joystick.getX();
+    jY=joystick.getY()*-1;
+    b2=joystick.getRawButton(2);
+    trigger=joystick.getTrigger();
+    double[] cTpResult = drivetrain.cTp(jX, jY);
+    tAngle=cTpResult[0];
+    dPower=cTpResult[1];
+    if(joystick.getRawButton(11)){idx=0;}
+    if(idx<Constants.MacroTime){jxArray[idx]=jX;tAngleArray[idx]=tAngle;dPowerArray[idx]=dPower;triggerArray[idx]=trigger;b2Array[idx]=b2;idx++;System.out.println(idx);}
+    if(joystick.getRawButton(4)){tAngle = (tAngle-(txDouble*Constants.LimeLightAimAssistG))%360;} //limelight aim assist
+    System.out.println(txDouble);
+    drivetrain.RobotMove(tAngle, dPower, jX, trigger, b2);
   }
   /** This function is called once when the robot is first started up. */
   @Override
