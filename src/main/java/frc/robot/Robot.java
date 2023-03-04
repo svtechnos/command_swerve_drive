@@ -13,6 +13,9 @@ import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.cameraserver.CameraServer;
+
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -39,6 +42,9 @@ public class Robot extends TimedRobot {
   private double txDouble;
   private double tyDouble;
   private Arm arm;
+
+  
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -51,6 +57,10 @@ public class Robot extends TimedRobot {
     this.arm = m_robotContainer.arm;
     this.arm_joystick = m_robotContainer.arm_joystick;
     drivetrain.resetDEncoders();
+    CameraServer.startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(1);
+    //cameraSelection=NetworkTableInstance.getDefault().getTable("").getEntry("CameraSelection");
+//CameraServer.startAutomaticCapture();
   }
 
   /**
@@ -81,6 +91,14 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    //if(SmartDashboard.getBoolean("CameraSel", true)){
+    //  System.out.println("Setting Camera 2");
+    //  cameraSelection.setString(camera2.getName());
+   // }
+    //else{
+    //  System.out.println("Setting Camera 1");
+    //  cameraSelection.setString(camera1.getName());
+    //}
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -113,7 +131,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     drivetrain.gyroSetYaw(0);
-    arm.set_servos(800,300,320,2000);
+    //arm.set_servos(800,300,320,2000);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
